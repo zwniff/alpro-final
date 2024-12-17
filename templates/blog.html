@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Terapia - Physical Therapy Website Template</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="" name="keywords">
+    <meta content="" name="description">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet"> 
+
+    <!-- Icon Font Stylesheet -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    <link href="{{ url_for('static', filename='lib/animate/animate.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='lib/owlcarousel/assets/owl.carousel.min.css') }}" rel="stylesheet">
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+
+    <!-- Template Stylesheet -->
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+</head>
+
+<body>
+
+    <!-- Spinner Start -->
+    <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+    <!-- Spinner End -->
+
+    <!-- Navbar & Hero Start -->
+    <div class="container-fluid position-relative p-0">
+        <nav class="navbar navbar-expand-lg navbar-light bg-white px-4 px-lg-5 py-3 py-lg-0">
+            <a href="{{ url_for('serve_index') }}" class="navbar-brand p-0">
+                <h1 class="text-primary m-0"><i class="fas fa-star-of-life me-3"></i>DiabeSense</h1>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+                <span class="fa fa-bars"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarCollapse">
+                <div class="navbar-nav ms-auto py-0">
+                    <a href="{{ url_for('serve_index') }}" class="nav-item nav-link">Home</a>
+                    <a href="{{ url_for('serve_about') }}" class="nav-item nav-link">About</a>    
+                    <a href="{{ url_for('serve_blog') }}" class="nav-item nav-link active">News</a>
+                </div>
+                <a href="{{ url_for('serve_feature') }}" class="btn btn-primary rounded-pill text-white py-2 px-4 flex-wrap flex-sm-shrink-0">Sense Now</a>
+            </div>
+        </nav>
+    </div>
+    <!-- Navbar End -->
+
+    <!-- Header Start -->
+    <div class="container-fluid bg-breadcrumb">
+        <div class="container text-center py-5" style="max-width: 900px;">
+            <h3 class="text-white display-3 mb-4 wow fadeInDown" data-wow-delay="0.1s">News</h3>  
+        </div>
+    </div>
+    <!-- Header End -->
+
+    <!-- News Start -->
+    <div class="container-fluid blog py-5">
+        <div class="container py-5">
+            <div class="section-title mb-5 wow fadeInUp" data-wow-delay="0.1s">
+                <div class="sub-style">
+                    <h4 class="sub-title px-3 mb-0">News</h4>
+                </div>
+                <h1 class="display-3 mb-4">Discover More Stories about Diabetes</h1>
+            </div>
+            <div class="row g-4 justify-content-center" id="news-container">
+                <!-- Dynamic news articles will be injected here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Define the News API URL and key
+        const API_URL = "https://newsapi.org/v2/everything?q=diabetes&apiKey=f9f121aa322348e58041d97cdd9f2ea3";
+    
+        // Function to fetch news from the API
+        async function fetchNews() {
+            try {
+                const response = await fetch(API_URL);
+                
+                // Check if the response is okay
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+    
+                const data = await response.json();
+    
+                // Check if articles are present in the response
+                if (data.articles && data.articles.length > 0) {
+                    displayNews(data.articles);
+                } else {
+                    displayError("No articles found. Please try again later.");
+                }
+            } catch (error) {
+                console.error("Error fetching news:", error);
+                displayError("Unable to fetch news. Please check your network or API key.");
+            }
+        }
+    
+        // Function to display news articles
+        function displayNews(articles) {
+            const container = document.getElementById("news-container");
+            container.innerHTML = ""; // Clear any existing content
+    
+            articles.slice(0, 8).forEach((article, index) => {
+                const delay = (index % 4) * 0.2; // Stagger animation delay
+                const newsTile = `
+                    <div class="col-md-6 col-lg-4 col-xl-3 wow fadeInUp" data-wow-delay="${delay}s">
+                        <div class="service-item rounded">
+                            <div class="service-img rounded-top">
+                                <img src="${article.urlToImage || 'img/default-news.jpg'}" class="img-fluid rounded-top w-100" alt="${article.title || 'News Image'}">
+                            </div>
+                            <div class="service-content rounded-bottom bg-light p-4">
+                                <div class="service-content-inner">
+                                    <h5 class="mb-4">${article.title || "Untitled"}</h5>
+                                    <p class="mb-4">${article.description || "No description available."}</p>
+                                    <a href="${article.url}" target="_blank" class="btn btn-primary rounded-pill text-white py-2 px-4 mb-2">Read More</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += newsTile;
+            });
+    
+            // Reinitialize animations (e.g., WOW.js)
+            new WOW().init();
+        }
+    
+        // Function to display an error message in the UI
+        function displayError(message) {
+            const container = document.getElementById("news-container");
+            container.innerHTML = `
+                <div class="col-12 text-center">
+                    <div class="alert alert-danger" role="alert">
+                        ${message}
+                    </div>
+                </div>
+            `;
+        }
+    
+        // Fetch news when the page loads
+        document.addEventListener("DOMContentLoaded", fetchNews);
+    </script>
+    <!-- News End --> 
+
+    <!-- Footer Start -->
+    <div class="container-fluid footer py-5 wow fadeIn" data-wow-delay="0.2s">
+        <div class="container py-5">
+            <div class="row g-5">
+                <div class="col-md-6 col-lg-6 col-xl-3">
+                    <div class="footer-item d-flex flex-column">
+                        <h4 class="text-white mb-4"><i class="fas fa-star-of-life me-3"></i>DiabeSense</h4>
+                        <p>Accurate Insights, Informed Decisions, Healthier Life</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-6 col-xl-3">
+                    <div class="footer-item d-flex flex-column">
+                        <h4 class="mb-4 text-white">More Info</h4>
+                        <a href="https://wa.me/qr/346UOOOVH7AMM1"><i class="fas fa-angle-right me-2"></i> Personal Inquiries</a>
+                        <a href="https://youtu.be/xvFZjo5PgG0?si=vXvAGEAlxV62h46U"><i class="fas fa-angle-right me-2"></i> Rehabilitation</a>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-6 col-xl-3">
+                    <div class="footer-item d-flex flex-column">
+                        <h4 class="mb-4 text-white">Contact Info</h4>
+                        <a href=""><i class="fa fa-map-marker-alt me-2"></i> NANO Tower, Airlangga University, Indonesia</a>
+                        <a href=""><i class="fas fa-envelope me-2"></i> vene@ganteng.com</a>
+                        <a href=""><i class="fas fa-envelope me-2"></i> fino@ganteng.com</a>
+                        <a href=""><i class="fas fa-envelope me-2"></i> najwa@ganteng.com</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Footer End -->
+
+    <!-- Back to Top -->
+    <a href="#" class="btn btn-primary btn-lg-square back-to-top"><i class="fa fa-arrow-up"></i></a>   
+
+    <!-- JavaScript Libraries -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='lib/wow/wow.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='lib/easing/easing.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='lib/waypoints/waypoints.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='lib/owlcarousel/owl.carousel.min.js') }}"></script>
+
+    <!-- Template Javascript -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+</body>
+</html>
